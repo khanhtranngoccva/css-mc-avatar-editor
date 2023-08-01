@@ -1,0 +1,27 @@
+.menubarContainer {
+    display: flex;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    padding: 16px;
+}
+
+.menubar {
+    border-radius: 8px;
+    box-shadow: 0 0 2px #0005;
+    width: 100%;
+    background: white;
+    padding: 16px;
+}
+
+.menubarOuterList {
+    display: flex;
+    gap: 16px;
+}
+
+.menubarList {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 8px;
+}

@@ -1,0 +1,28 @@
+.colorInput {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 8px;
+    aspect-ratio: 1/1;
+    display: block;
+    border: none;
+    background-color: transparent;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 0 3px #0008;
+}
+
+.colorInput::-webkit-color-swatch {
+    border-radius: 8px;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.colorInput::-moz-color-swatch {
+    border-radius: 8px;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
