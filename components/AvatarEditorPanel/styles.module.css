@@ -1,6 +1,5 @@
 .menubarContainer {
     display: flex;
-    position: absolute;
     width: 100%;
     bottom: 0;
     padding: 16px;

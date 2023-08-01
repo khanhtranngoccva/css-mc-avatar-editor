@@ -3,4 +3,6 @@
     height: 100%;
     background: skyblue;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }

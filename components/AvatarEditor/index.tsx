@@ -11,8 +11,8 @@ export default function AvatarEditor() {
     return <AvatarEditorProvider>
         <AvatarStateProvider>
             <div className={classes.editor}>
-                <AvatarEditorView></AvatarEditorView>
                 <AvatarEditorPanel></AvatarEditorPanel>
+                <AvatarEditorView></AvatarEditorView>
             </div>
         </AvatarStateProvider>
     </AvatarEditorProvider>
@@ -20,7 +20,7 @@ export default function AvatarEditor() {
 
 function AvatarEditorView() {
     const editorContext = React.useContext(AvatarEditorContext);
-    const {boxes, updateBox, setup} = useAvatarState();
+    const {boxes} = useAvatarState();
 
     return <Scene perspective={"1200px"} perspectiveOriginY={"-100px"}>
         <Camera canRotate={editorContext.mode === "view"} rotationSensitivity={500} onRotate={e => {
