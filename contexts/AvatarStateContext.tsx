@@ -2,6 +2,7 @@ import React from "react";
 import useBoxesWithGrids, {Grids} from "@/hooks/useBoxesWithGrids";
 import {SideType} from "@/components/PaintablePixelBox";
 import useMemoizedObject from "@/hooks/useMemoizedObject";
+import {AvatarEditorContext} from "@/contexts/AvatarEditorContext";
 
 
 const SETUP_INFO = {
@@ -22,7 +23,7 @@ export type AvatarBlockSetupInfo = typeof SETUP_INFO[BoxName];
 export interface AvatarStateContext {
     setup: Record<BoxName, AvatarBlockSetupInfo>;
     boxes: Record<BoxName, Grids>;
-    updateBox: (boxName: BoxName, sideType: SideType, coordinates: { x: number, y: number }, color: string) => void;
+    activateTile: (boxName: BoxName, sideType: SideType, coordinates: { x: number, y: number }) => void;
 }
 
 const AvatarStateContext = React.createContext<AvatarStateContext | null>(null);
@@ -36,10 +37,24 @@ export function useAvatarState() {
 }
 
 export default function AvatarStateProvider({children}: {children?: React.ReactNode}) {
+    const avatarEditorContext = React.useContext(AvatarEditorContext);
+    const colorRef = React.useRef<string>(avatarEditorContext.currentColor);
     const [boxes, updateBox] = useBoxesWithGrids(SETUP_INFO, {},  "#0000");
 
+    React.useEffect(() => {
+        colorRef.current = avatarEditorContext.currentColor;
+    }, [avatarEditorContext.currentColor]);
+
+    const activateTile = React.useCallback(function (boxName: BoxName, sideType: SideType, coordinates: { x: number, y: number }) {
+        if (avatarEditorContext.mode === "erase") {
+            updateBox(boxName, sideType, coordinates, "#00000000");
+        } else if (avatarEditorContext.mode === "paint") {
+            updateBox(boxName, sideType, coordinates, colorRef.current);
+        }
+    }, [avatarEditorContext.mode, updateBox]);
+
     const ctxValue: AvatarStateContext = useMemoizedObject({
-        boxes, setup: SETUP_INFO, updateBox
+        boxes, setup: SETUP_INFO, activateTile,
     });
 
     return <AvatarStateContext.Provider value={ctxValue}>

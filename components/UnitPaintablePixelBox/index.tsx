@@ -5,12 +5,12 @@ import {BoxName, useAvatarState} from "@/contexts/AvatarStateContext";
 function _AvatarPixelBox(props: {
     variant: BoxName,
 }) {
-    const {boxes, updateBox, setup} = useAvatarState()
+    const {boxes, activateTile, setup} = useAvatarState()
     const setupInfo = setup[props.variant];
 
-    const updateCb = React.useCallback((...args: Parameters<PaintablePixelBoxProps["modifyGridContents"]>) => {
-        updateBox(props.variant, ...args);
-    }, [updateBox, props.variant]);
+    const updateCb = React.useCallback((...args: Parameters<PaintablePixelBoxProps["onTileActive"]>) => {
+        activateTile(props.variant, ...args);
+    }, [activateTile, props.variant]);
 
     return <PaintablePixelBox
         width={`calc(${setupInfo.width} * ${setupInfo.baseUnit})`}
@@ -20,7 +20,7 @@ function _AvatarPixelBox(props: {
         y={`calc(${setupInfo.y} * ${setupInfo.baseUnit})`}
         z={`calc(${setupInfo.z} * ${setupInfo.baseUnit})`}
         grids={boxes[props.variant]}
-        modifyGridContents={updateCb}
+        onTileActive={updateCb}
     />
 }
 

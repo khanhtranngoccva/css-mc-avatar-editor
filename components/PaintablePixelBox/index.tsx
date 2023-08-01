@@ -19,7 +19,7 @@ export interface PaintablePixelBoxProps {
     z?: string;
     defaultColor?: string;
     grids: Record<SideType, string[][]>;
-    modifyGridContents: (type: SideType, coordinates: { x: number, y: number }, color: string) => void;
+    onTileActive: (type: SideType, coordinates: { x: number, y: number }) => void;
     hideFaces?: SideType[];
 }
 
@@ -101,25 +101,15 @@ function _PaintablePixelBox(props: PaintablePixelBoxProps) {
     const defaultColor = props.defaultColor ?? "#0002";
     const hideFaces = props.hideFaces ?? [];
     const editorContext = React.useContext(AvatarEditorContext);
-    const colorRef = React.useRef<string>(editorContext.currentColor);
-    const {modifyGridContents} = props;
-
-    // Hmmmm, nice.
-    React.useEffect(() => {
-        colorRef.current = editorContext.currentColor;
-    }, [editorContext.currentColor]);
+    const {onTileActive} = props;
 
     const callbackMemo = React.useMemo(() => {
         return Object.fromEntries(SIDE_TYPES._def.values.map(sideType => {
             return [sideType, function (coordinates: { x: number, y: number }) {
-                if (editorContext.mode === "paint") {
-                    modifyGridContents(sideType, coordinates, colorRef.current);
-                } else if (editorContext.mode === "erase") {
-                    modifyGridContents(sideType, coordinates, "#00000000");
-                }
+                onTileActive(sideType, coordinates);
             }]
         })) as Record<SideType, (coordinates: { x: number, y: number }) => void>;
-    }, [modifyGridContents, editorContext.mode]);
+    }, [onTileActive]);
 
     return <Box.Root width={props.width} height={props.height} length={props.length} x={props.x} y={props.y}
                      z={props.z}>
