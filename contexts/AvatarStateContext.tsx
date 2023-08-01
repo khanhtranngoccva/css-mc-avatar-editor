@@ -36,7 +36,7 @@ export function useAvatarState() {
 }
 
 export default function AvatarStateProvider({children}: {children?: React.ReactNode}) {
-    const [boxes, updateBox] = useBoxesWithGrids(SETUP_INFO, {},  "#FFF");
+    const [boxes, updateBox] = useBoxesWithGrids(SETUP_INFO, {},  "#0000");
 
     const ctxValue: AvatarStateContext = useMemoizedObject({
         boxes, setup: SETUP_INFO, updateBox

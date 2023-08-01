@@ -2,7 +2,7 @@ import React from "react";
 import {z} from "zod";
 import useMemoizedObject from "@/hooks/useMemoizedObject";
 
-export const AVATAR_EDITOR_MODES = z.enum(["paint", "view"]);
+export const AVATAR_EDITOR_MODES = z.enum(["paint", "view", "erase"]);
 export type AvatarEditorMode = z.infer<typeof AVATAR_EDITOR_MODES>
 
 export interface AvatarEditorContext {

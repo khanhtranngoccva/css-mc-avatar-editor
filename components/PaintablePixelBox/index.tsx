@@ -1,13 +1,14 @@
 import React from "react";
 import Box from "@/components/react-dimension-css/components/Box";
-import useActiveElement from "@/hooks/useActiveElement";
 import classes from "./styles.module.css";
 import _ from "lodash";
 import useEventListener from "@/components/react-dimension-css/hooks/useEventListener";
 import useActiveEvent from "@/hooks/useActiveEvent";
 import {AvatarEditorContext, AvatarEditorMode} from "@/contexts/AvatarEditorContext";
+import {z} from "zod";
 
-export type SideType = "top" | "left" | "right" | "bottom" | "front" | "back";
+export const SIDE_TYPES = z.enum(["top", "back", "bottom", "front", "right", "left"]);
+export type SideType = z.infer<typeof SIDE_TYPES>;
 
 export interface PaintablePixelBoxProps {
     width?: string;
@@ -23,8 +24,8 @@ export interface PaintablePixelBoxProps {
 }
 
 function _Tile(props: {
-    onActive?: (coords: {x: number, y: number}) => void;
-    onInactive?: (coords: {x: number, y: number}) => void;
+    onActive?: (coords: { x: number, y: number }) => void;
+    onInactive?: (coords: { x: number, y: number }) => void;
     x: number;
     y: number;
     color: string;
@@ -54,25 +55,31 @@ function _Grid(props: {
     hidden: boolean;
     defaultColor: string;
     gridContents: string[][],
-    paintable: boolean;
+    mode: AvatarEditorMode;
     onActive: (coordinates: { x: number, y: number }) => void,
 }) {
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const gridTemplateRows = props.gridContents.length;
     const gridTemplateColumns = props.gridContents.length ? Math.max(...props.gridContents.map(row => row.length)) : 0;
-    const {paintable, onActive} = props;
+    const {onActive} = props;
+    useActiveEvent(containerRef);
 
-    const callback = React.useCallback(({x, y}: {x: number, y: number}) => {
-        if (paintable) {
-            onActive({x, y});
-        }
-    }, [paintable, onActive]);
+    const cursor: Record<AvatarEditorMode, string | undefined> = {
+        erase: "crosshair",
+        paint: "crosshair",
+        view: undefined,
+    };
 
-    return <div className={classes.grid} style={{
+    const callback = React.useCallback(({x, y}: { x: number, y: number }) => {
+        onActive({x, y});
+    }, [onActive]);
+
+    return <div ref={containerRef} className={classes.grid} style={{
         gridTemplateRows: `repeat(${gridTemplateRows}, 1fr)`,
         gridTemplateColumns: `repeat(${gridTemplateColumns}, 1fr)`,
         background: props.defaultColor,
         display: props.hidden ? "none" : "grid",
-        cursor: props.paintable ? "crosshair" : undefined,
+        cursor: cursor[props.mode],
     }}>
         {_.range(0, gridTemplateRows).map((__, rowIndex) => {
             return _.range(0, gridTemplateColumns).map((__, colIndex) => {
@@ -91,12 +98,9 @@ function _Grid(props: {
 const Grid = React.memo(_Grid);
 
 function _PaintablePixelBox(props: PaintablePixelBoxProps) {
-    const containerRef = React.useRef<HTMLDivElement>(null);
-    useActiveEvent(containerRef);
-    const defaultColor = props.defaultColor ?? "#FFFFFF";
+    const defaultColor = props.defaultColor ?? "#0002";
     const hideFaces = props.hideFaces ?? [];
     const editorContext = React.useContext(AvatarEditorContext);
-    const paintable = editorContext.mode === "paint";
     const colorRef = React.useRef<string>(editorContext.currentColor);
     const {modifyGridContents} = props;
 
@@ -106,26 +110,25 @@ function _PaintablePixelBox(props: PaintablePixelBoxProps) {
     }, [editorContext.currentColor]);
 
     const callbackMemo = React.useMemo(() => {
-        const out: Record<SideType, (coordinates: { x: number, y: number }) => void> = {
-            left: (...args) => modifyGridContents("left", ...args, colorRef.current),
-            right: (...args) => modifyGridContents("right", ...args, colorRef.current),
-            front: (...args) => modifyGridContents("front", ...args, colorRef.current),
-            back: (...args) => modifyGridContents("back", ...args, colorRef.current),
-            top: (...args) => modifyGridContents("top", ...args, colorRef.current),
-            bottom: (...args) => modifyGridContents("bottom", ...args, colorRef.current),
-        }
+        return Object.fromEntries(SIDE_TYPES._def.values.map(sideType => {
+            return [sideType, function (coordinates: { x: number, y: number }) {
+                if (editorContext.mode === "paint") {
+                    modifyGridContents(sideType, coordinates, colorRef.current);
+                } else if (editorContext.mode === "erase") {
+                    modifyGridContents(sideType, coordinates, "#00000000");
+                }
+            }]
+        })) as Record<SideType, (coordinates: { x: number, y: number }) => void>;
+    }, [modifyGridContents, editorContext.mode]);
 
-        return out;
-    }, [modifyGridContents]);
-
-    return <Box.Root width={props.width} height={props.height} length={props.length} x={props.x} y={props.y} z={props.z}
-                     ref={containerRef}>
+    return <Box.Root width={props.width} height={props.height} length={props.length} x={props.x} y={props.y}
+                     z={props.z}>
         <Box.Left>
             <Grid
                 defaultColor={defaultColor}
                 gridContents={props.grids.left}
                 hidden={hideFaces.includes("left")}
-                paintable={paintable}
+                mode={editorContext.mode}
                 onActive={callbackMemo.left}
             />
         </Box.Left>
@@ -134,7 +137,7 @@ function _PaintablePixelBox(props: PaintablePixelBoxProps) {
                 defaultColor={defaultColor}
                 gridContents={props.grids.right}
                 hidden={hideFaces.includes("right")}
-                paintable={paintable}
+                mode={editorContext.mode}
                 onActive={callbackMemo.right}
             />
         </Box.Right>
@@ -143,7 +146,7 @@ function _PaintablePixelBox(props: PaintablePixelBoxProps) {
                 defaultColor={defaultColor}
                 gridContents={props.grids.top}
                 hidden={hideFaces.includes("top")}
-                paintable={paintable}
+                mode={editorContext.mode}
                 onActive={callbackMemo.top}
             />
         </Box.Top>
@@ -152,7 +155,7 @@ function _PaintablePixelBox(props: PaintablePixelBoxProps) {
                 defaultColor={defaultColor}
                 gridContents={props.grids.bottom}
                 hidden={hideFaces.includes("bottom")}
-                paintable={paintable}
+                mode={editorContext.mode}
                 onActive={callbackMemo.bottom}
             />
         </Box.Bottom>
@@ -161,7 +164,7 @@ function _PaintablePixelBox(props: PaintablePixelBoxProps) {
                 defaultColor={defaultColor}
                 gridContents={props.grids.front}
                 hidden={hideFaces.includes("front")}
-                paintable={paintable}
+                mode={editorContext.mode}
                 onActive={callbackMemo.front}
             />
         </Box.Front>
@@ -170,7 +173,7 @@ function _PaintablePixelBox(props: PaintablePixelBoxProps) {
                 defaultColor={defaultColor}
                 gridContents={props.grids.back}
                 hidden={hideFaces.includes("back")}
-                paintable={paintable}
+                mode={editorContext.mode}
                 onActive={callbackMemo.back}
             />
         </Box.Back>

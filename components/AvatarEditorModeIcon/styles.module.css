@@ -13,3 +13,8 @@
 .active, .button:active {
     background: #0003;
 }
+
+.icon {
+    width: 24px;
+    height: 24px;
+}

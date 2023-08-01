@@ -12,42 +12,36 @@
     height: var(--height);
     width: var(--width);
     transform: translate(-50%, -50%) rotateY(-90deg) translateZ(calc(var(--length) / 2));
-    background: rebeccapurple;
 }
 
 .front {
     height: var(--height);
     width: var(--length);
     transform: translate(-50%, -50%) translateZ(calc(var(--width) / 2));
-    background: red;
 }
 
 .back {
     height: var(--height);
     width: var(--length);
     transform: translate(-50%, -50%) rotateY(180deg) translateZ(calc(var(--width) / 2));
-    background: yellow;
 }
 
 .right {
     height: var(--height);
     width: var(--width);
     transform: translate(-50%, -50%) rotateY(90deg) translateZ(calc(var(--length) / 2));
-    background: green;
 }
 
 .top {
     height: var(--width);
     width: var(--length);
     transform: translate(-50%, -50%) rotateX(90deg) translateZ(calc(var(--height) / 2));
-    background: deepskyblue;
 }
 
 .bottom {
     height: var(--width);
     width: var(--length);
     transform: translate(-50%, -50%) rotateX(-90deg) translateZ(calc(var(--height) / 2));
-    background: black;
 }
 
 .side {
