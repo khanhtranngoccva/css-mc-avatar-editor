@@ -33,13 +33,6 @@ interface RotateEventData {
 }
 
 // Whatever, hacky patch.
-(function() {
-   class CustomEvent {}
-   try {
-       // @ts-ignore
-       global.CustomEvent = CustomEvent;
-   } catch (e) {}
-})();
 
 class RotateEvent extends CustomEvent<RotateEventData> {
     // @ts-ignore
@@ -129,6 +122,7 @@ function _Camera(props: CameraProps) {
         let _rotateZ = rotateZ ?? getComputedStyle(cameraRef.current!).getPropertyValue("--rotateZ");
 
         if (!isForcedUpdate) {
+            console.log(CustomEvent);
             cameraRef.current?.dispatchEvent(new RotateEvent({
                 rotation: {
                     rotateX: _rotateX,
