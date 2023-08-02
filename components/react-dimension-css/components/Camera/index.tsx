@@ -122,7 +122,6 @@ function _Camera(props: CameraProps) {
         let _rotateZ = rotateZ ?? getComputedStyle(cameraRef.current!).getPropertyValue("--rotateZ");
 
         if (!isForcedUpdate) {
-            console.log(CustomEvent);
             cameraRef.current?.dispatchEvent(new RotateEvent({
                 rotation: {
                     rotateX: _rotateX,
