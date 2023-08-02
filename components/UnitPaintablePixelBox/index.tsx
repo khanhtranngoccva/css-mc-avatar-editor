@@ -10,19 +10,35 @@ function _AvatarPixelBox(props: {
     variant: BoxName,
 }) {
     const {avatarCanWalk} = React.useContext(AvatarEditorContext);
-    const {boxes, activateTile, setup} = useAvatarState()
+    const {boxes, activateTile, setup, shown} = useAvatarState()
     const setupInfo = setup[props.variant];
-
     const updateCb = React.useCallback((...args: Parameters<PaintablePixelBoxProps["onTileActive"]>) => {
         activateTile(props.variant, ...args);
     }, [activateTile, props.variant]);
-
     const walking = avatarCanWalk && setupInfo.canSwing;
+    const [internalWalking, setInternalWalking] = React.useState(walking);
 
-    const style: React.CSSProperties = walking ? {
+    React.useEffect(() => {
+        if (walking && !internalWalking) {
+            requestAnimationFrame(() => {
+                setInternalWalking(true);
+            })
+        }
+    }, [walking, internalWalking]);
+
+
+    React.useEffect(() => {
+        if (walking) {
+            setInternalWalking(false);
+        }
+    }, [walking, ...Object.values(shown)]);
+
+    const style: React.CSSProperties = internalWalking ? {
         animationDelay: `calc(${setupInfo.swingDelayMultiplier} * var(--swingDuration))`,
         transformOrigin: `0 calc(${setupInfo.baseUnit} * ${setupInfo.swingCenterY}) 0`
     } : {};
+
+    console.log(internalWalking);
 
     return <Group
         x={`calc(${setupInfo.x} * ${setupInfo.baseUnit})`}
@@ -35,7 +51,7 @@ function _AvatarPixelBox(props: {
             length={`calc(${setupInfo.length} * ${setupInfo.baseUnit} + ${setupInfo.wrapSize})`}
             grids={boxes[props.variant]}
             style={style}
-            className={walking ? classes.swing : ''}
+            className={internalWalking ? classes.swing : ''}
             onTileActive={updateCb}
         />
     </Group>
