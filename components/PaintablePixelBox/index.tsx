@@ -3,9 +3,10 @@ import Box from "@/components/react-dimension-css/components/Box";
 import _ from "lodash";
 import useEventListener from "@/components/react-dimension-css/hooks/useEventListener";
 import useActiveEvent from "@/hooks/useActiveEvent";
-import {AvatarEditorContext, AvatarEditorMode} from "@/contexts/AvatarEditorContext";
+import {AvatarEditorContext} from "@/contexts/AvatarEditorContext";
 import {z} from "zod";
 import classes from "./styles.module.css";
+import {AvatarEditorMode} from "@/constants/setup";
 
 export const SIDE_TYPES = z.enum(["top", "back", "bottom", "front", "right", "left"]);
 export type SideType = z.infer<typeof SIDE_TYPES>;
