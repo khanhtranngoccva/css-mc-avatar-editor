@@ -32,6 +32,13 @@ interface RotateEventData {
     rotation: { rotateX: string, rotateY: string, rotateZ: string };
 }
 
+// Whatever, hacky patch.
+(function() {
+   class CustomEvent {}
+   // @ts-ignore
+   global.CustomEvent = CustomEvent;
+})();
+
 class RotateEvent extends CustomEvent<RotateEventData> {
     // @ts-ignore
     type: "rotate";
