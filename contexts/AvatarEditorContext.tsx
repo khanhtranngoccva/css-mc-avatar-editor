@@ -1,12 +1,12 @@
 import React from "react";
-import {z} from "zod";
 import useMemoizedObject from "@/hooks/useMemoizedObject";
+import {AvatarEditorMode} from "@/constants/setup";
 
-export const AVATAR_EDITOR_MODES = z.enum(["paint", "view", "erase"]);
-export type AvatarEditorMode = z.infer<typeof AVATAR_EDITOR_MODES>
 
 export interface AvatarEditorContext {
     mode: AvatarEditorMode;
+    avatarCanWalk: boolean;
+    toggleAvatarCanWalk: () => void;
     setMode: (mode: AvatarEditorMode) => void;
     colorHistory: string[];
     setCurrentColor: (color: string) => void;
@@ -27,10 +27,12 @@ export const AvatarEditorContext = React.createContext<AvatarEditorContext>({
     setCurrentColor: () => {
     },
     currentColor: "#FFFFFF",
+    avatarCanWalk: false,
+    toggleAvatarCanWalk() {}
 });
 
 function useColorHistory(maxHistoryLength: number, defaultColor: string) {
-    const [history, setHistory] = React.useState<(string|undefined)[]>(() => {
+    const [history, setHistory] = React.useState<(string | undefined)[]>(() => {
         return Array.from({length: maxHistoryLength}, () => defaultColor);
     });
 
@@ -56,7 +58,12 @@ export default function AvatarEditorProvider(props: AvatarEditorProviderProps) {
     const [colorHistory, pushColorToHistory] = useColorHistory(maxHistoryLength, initialColor);
     const [currentColor, _setCurrentColor] = React.useState(initialColor);
     const [mode, setMode] = React.useState<AvatarEditorMode>("view");
-    const timeoutRef = React.useRef<number|undefined>();
+    const [avatarCanWalk, setAvatarCanWalk] = React.useState(false);
+    const timeoutRef = React.useRef<number | undefined>();
+
+    const toggleAvatarCanWalk = React.useCallback(() => {
+        setAvatarCanWalk(avatarCanWalk => !avatarCanWalk);
+    }, [setAvatarCanWalk]);
 
     const setCurrentColor = React.useCallback((color: string) => {
         _setCurrentColor(color);
@@ -73,7 +80,9 @@ export default function AvatarEditorProvider(props: AvatarEditorProviderProps) {
         setMode,
         colorHistory,
         setCurrentColor,
-        currentColor
+        currentColor,
+        avatarCanWalk,
+        toggleAvatarCanWalk
     });
 
     return <AvatarEditorContext.Provider value={value}>

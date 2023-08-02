@@ -11,21 +11,25 @@ export interface Dimension {
     length: number;
 }
 
+function getNewBoxesObject<BoxName extends string>(boxesDimensions: Record<BoxName, Dimension>, boxesData: Partial<Record<BoxName, Grids>>, defaultColor: string) {
+    return Object.fromEntries(Object.entries<Dimension>(boxesDimensions).map(([_key, dimension]) => {
+        const key = _key as BoxName;
+        return [
+            key, {
+                top: boxesData[key]?.top ?? generate2DColorArray({width: dimension.length, height: dimension.width}, defaultColor),
+                bottom: boxesData[key]?.bottom ?? generate2DColorArray({width: dimension.length, height: dimension.width}, defaultColor),
+                left: boxesData[key]?.left ?? generate2DColorArray({width: dimension.width, height: dimension.height}, defaultColor),
+                right: boxesData[key]?.right ?? generate2DColorArray({width: dimension.width, height: dimension.height}, defaultColor),
+                front: boxesData[key]?.front ?? generate2DColorArray({width: dimension.length, height: dimension.height}, defaultColor),
+                back: boxesData[key]?.back ?? generate2DColorArray({width: dimension.length, height: dimension.height}, defaultColor),
+            }
+        ];
+    })) as Record<BoxName, Grids>;
+}
+
 export default function useBoxesWithGrids<BoxName extends string>(boxesDimensions: Record<BoxName, Dimension>, boxesInitialData: Partial<Record<BoxName, Grids>>, defaultColor: string) {
     const [boxes, setBoxes] = useStateWithDeps<Record<BoxName, Grids>>(() => {
-        return Object.fromEntries(Object.entries<Dimension>(boxesDimensions).map(([_key, dimension]) => {
-            const key = _key as BoxName;
-            return [
-                key, {
-                    top: boxesInitialData[key]?.top ?? generate2DColorArray({width: dimension.length, height: dimension.width}, defaultColor),
-                    bottom: boxesInitialData[key]?.bottom ?? generate2DColorArray({width: dimension.length, height: dimension.width}, defaultColor),
-                    left: boxesInitialData[key]?.left ?? generate2DColorArray({width: dimension.width, height: dimension.height}, defaultColor),
-                    right: boxesInitialData[key]?.right ?? generate2DColorArray({width: dimension.width, height: dimension.height}, defaultColor),
-                    front: boxesInitialData[key]?.front ?? generate2DColorArray({width: dimension.length, height: dimension.height}, defaultColor),
-                    back: boxesInitialData[key]?.back ?? generate2DColorArray({width: dimension.length, height: dimension.height}, defaultColor),
-                }
-            ];
-        })) as Record<BoxName, Grids>;
+        return getNewBoxesObject(boxesDimensions, boxesInitialData, defaultColor);
     }, [...Object.values(boxesDimensions), defaultColor]);
 
     const updateBox = React.useCallback((boxName: BoxName, sideType: SideType, coordinates: { x: number, y: number }, color: string) => {
@@ -49,5 +53,9 @@ export default function useBoxesWithGrids<BoxName extends string>(boxesDimension
         });
     }, [setBoxes]);
 
-    return [boxes, updateBox] as [typeof boxes, typeof updateBox];
+    const reloadBoxes = React.useCallback((data: Partial<Record<BoxName, Grids>>) => {
+        setBoxes(getNewBoxesObject(boxesDimensions, data, defaultColor))
+    }, [setBoxes, boxesDimensions, defaultColor]);
+
+    return [boxes, updateBox, reloadBoxes] as [typeof boxes, typeof updateBox, typeof reloadBoxes];
 }

@@ -1,0 +1,32 @@
+.menubarContainer {
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+}
+
+.menubar {
+    border-radius: 8px;
+    box-shadow: 0 0 2px #0005;
+    width: 100%;
+    background: white;
+    padding: 16px;
+    overflow: auto;
+}
+
+.menubarOuterList {
+    display: flex;
+    gap: 16px;
+}
+
+.menubarContainer.column {
+    width: fit-content;
+    height: 100%;
+}
+
+.column .menubar {
+    height: 100%;
+}
+
+.column .menubarOuterList {
+    flex-direction: column;
+}

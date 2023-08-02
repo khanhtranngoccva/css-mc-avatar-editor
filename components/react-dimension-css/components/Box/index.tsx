@@ -10,7 +10,7 @@ export interface RootProps extends ComponentProps<"div"> {
     x?: string;
     y?: string;
     z?: string;
-    styles?: CSSProperties;
+    style?: CSSProperties;
 }
 
 export interface SideProps extends ComponentProps<"div"> {
@@ -27,7 +27,7 @@ function Root(props: RootProps, ref: React.ForwardedRef<HTMLDivElement>) {
         "--x": props.x,
         "--y": props.y,
         "--z": props.z,
-        ...props.styles,
+        ...props.style,
     } as CSSProperties}>
         {props.children}
     </div>

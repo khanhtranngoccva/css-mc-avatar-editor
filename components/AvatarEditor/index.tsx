@@ -6,13 +6,17 @@ import AvatarEditorPanel from "@/components/AvatarEditorPanel";
 import classes from './styles.module.css';
 import AvatarPixelBox from "../UnitPaintablePixelBox";
 import AvatarStateProvider, {useAvatarState} from "@/contexts/AvatarStateContext";
+import AvatarPartToggle from "@/components/AvatarPartToggle";
 
 export default function AvatarEditor() {
     return <AvatarEditorProvider>
         <AvatarStateProvider>
             <div className={classes.editor}>
                 <AvatarEditorPanel></AvatarEditorPanel>
-                <AvatarEditorView></AvatarEditorView>
+                <div className={classes.workspace}>
+                    <AvatarPartToggle></AvatarPartToggle>
+                    <AvatarEditorView></AvatarEditorView>
+                </div>
             </div>
         </AvatarStateProvider>
     </AvatarEditorProvider>
@@ -20,14 +24,14 @@ export default function AvatarEditor() {
 
 function AvatarEditorView() {
     const editorContext = React.useContext(AvatarEditorContext);
-    const {boxes} = useAvatarState();
+    const {boxes, shown} = useAvatarState();
 
     return <Scene perspective={"1200px"} perspectiveOriginY={"-100px"}>
         <Camera canRotate={editorContext.mode === "view"} rotationSensitivity={500} onRotate={e => {
         }}>
             {Object.keys(boxes).map((_key) => {
                 const key = _key as keyof typeof boxes;
-                return <AvatarPixelBox key={key} variant={key}></AvatarPixelBox>
+                return shown[key] ? <AvatarPixelBox key={key} variant={key}></AvatarPixelBox> : null;
             })}
         </Camera>
     </Scene>

@@ -1,11 +1,11 @@
 import React from "react";
 import Box from "@/components/react-dimension-css/components/Box";
-import classes from "./styles.module.css";
 import _ from "lodash";
 import useEventListener from "@/components/react-dimension-css/hooks/useEventListener";
 import useActiveEvent from "@/hooks/useActiveEvent";
 import {AvatarEditorContext, AvatarEditorMode} from "@/contexts/AvatarEditorContext";
 import {z} from "zod";
+import classes from "./styles.module.css";
 
 export const SIDE_TYPES = z.enum(["top", "back", "bottom", "front", "right", "left"]);
 export type SideType = z.infer<typeof SIDE_TYPES>;
@@ -17,7 +17,9 @@ export interface PaintablePixelBoxProps {
     x?: string;
     y?: string;
     z?: string;
-    defaultColor?: string;
+    className?: string;
+    style?: React.CSSProperties;
+    transparentColor?: string;
     grids: Record<SideType, string[][]>;
     onTileActive: (type: SideType, coordinates: { x: number, y: number }) => void;
     hideFaces?: SideType[];
@@ -53,7 +55,7 @@ const Tile = React.memo(_Tile);
 
 function _Grid(props: {
     hidden: boolean;
-    defaultColor: string;
+    transparentColor: string;
     gridContents: string[][],
     mode: AvatarEditorMode;
     onActive: (coordinates: { x: number, y: number }) => void,
@@ -77,7 +79,7 @@ function _Grid(props: {
     return <div ref={containerRef} className={classes.grid} style={{
         gridTemplateRows: `repeat(${gridTemplateRows}, 1fr)`,
         gridTemplateColumns: `repeat(${gridTemplateColumns}, 1fr)`,
-        background: props.defaultColor,
+        background: props.transparentColor,
         display: props.hidden ? "none" : "grid",
         cursor: cursor[props.mode],
     }}>
@@ -85,7 +87,7 @@ function _Grid(props: {
             return _.range(0, gridTemplateColumns).map((__, colIndex) => {
                 return <Tile
                     key={rowIndex * gridTemplateRows + colIndex}
-                    color={props.gridContents[rowIndex][colIndex] ?? props.defaultColor}
+                    color={props.gridContents[rowIndex][colIndex] ?? props.transparentColor}
                     x={colIndex}
                     y={rowIndex}
                     onActive={callback}
@@ -98,7 +100,7 @@ function _Grid(props: {
 const Grid = React.memo(_Grid);
 
 function _PaintablePixelBox(props: PaintablePixelBoxProps) {
-    const defaultColor = props.defaultColor ?? "#0002";
+    const transparentColor = props.transparentColor ?? "#0001";
     const hideFaces = props.hideFaces ?? [];
     const editorContext = React.useContext(AvatarEditorContext);
     const {onTileActive} = props;
@@ -112,55 +114,55 @@ function _PaintablePixelBox(props: PaintablePixelBoxProps) {
     }, [onTileActive]);
 
     return <Box.Root width={props.width} height={props.height} length={props.length} x={props.x} y={props.y}
-                     z={props.z}>
-        <Box.Left>
+                     z={props.z} className={props.className} style={props.style}>
+        <Box.Left className={classes.side}>
             <Grid
-                defaultColor={defaultColor}
+                transparentColor={transparentColor}
                 gridContents={props.grids.left}
                 hidden={hideFaces.includes("left")}
                 mode={editorContext.mode}
                 onActive={callbackMemo.left}
             />
         </Box.Left>
-        <Box.Right>
+        <Box.Right className={classes.side}>
             <Grid
-                defaultColor={defaultColor}
+                transparentColor={transparentColor}
                 gridContents={props.grids.right}
                 hidden={hideFaces.includes("right")}
                 mode={editorContext.mode}
                 onActive={callbackMemo.right}
             />
         </Box.Right>
-        <Box.Top>
+        <Box.Top className={classes.side}>
             <Grid
-                defaultColor={defaultColor}
+                transparentColor={transparentColor}
                 gridContents={props.grids.top}
                 hidden={hideFaces.includes("top")}
                 mode={editorContext.mode}
                 onActive={callbackMemo.top}
             />
         </Box.Top>
-        <Box.Bottom>
+        <Box.Bottom className={classes.side}>
             <Grid
-                defaultColor={defaultColor}
+                transparentColor={transparentColor}
                 gridContents={props.grids.bottom}
                 hidden={hideFaces.includes("bottom")}
                 mode={editorContext.mode}
                 onActive={callbackMemo.bottom}
             />
         </Box.Bottom>
-        <Box.Front>
+        <Box.Front className={classes.side}>
             <Grid
-                defaultColor={defaultColor}
+                transparentColor={transparentColor}
                 gridContents={props.grids.front}
                 hidden={hideFaces.includes("front")}
                 mode={editorContext.mode}
                 onActive={callbackMemo.front}
             />
         </Box.Front>
-        <Box.Back>
+        <Box.Back className={classes.side}>
             <Grid
-                defaultColor={defaultColor}
+                transparentColor={transparentColor}
                 gridContents={props.grids.back}
                 hidden={hideFaces.includes("back")}
                 mode={editorContext.mode}

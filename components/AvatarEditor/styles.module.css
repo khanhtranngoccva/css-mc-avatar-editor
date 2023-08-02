@@ -5,4 +5,14 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+    overflow: hidden;
+}
+
+.workspace {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    overflow: hidden;
 }

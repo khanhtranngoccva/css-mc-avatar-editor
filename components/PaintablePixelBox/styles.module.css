@@ -6,3 +6,7 @@
     user-select: none;
     pointer-events: visible;
 }
+
+.side {
+    backface-visibility: visible;
+}
