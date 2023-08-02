@@ -35,8 +35,10 @@ interface RotateEventData {
 // Whatever, hacky patch.
 (function() {
    class CustomEvent {}
-   // @ts-ignore
-   global.CustomEvent = CustomEvent;
+   try {
+       // @ts-ignore
+       global.CustomEvent = CustomEvent;
+   } catch (e) {}
 })();
 
 class RotateEvent extends CustomEvent<RotateEventData> {
