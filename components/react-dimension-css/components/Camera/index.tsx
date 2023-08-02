@@ -32,14 +32,34 @@ interface RotateEventData {
     rotation: { rotateX: string, rotateY: string, rotateZ: string };
 }
 
-// Whatever, hacky patch.
+// Whatever, polyfill.
+try {
+    class CustomEvent<T> extends Event {
+        _detail: T;
+
+        constructor(type: string, options: {bubbles?: boolean, composed?: boolean, detail: T, cancelable?: boolean}) {
+            super(type, options);
+            this._detail = options.detail;
+        }
+
+        get detail() {
+            return this._detail;
+        }
+    }
+
+    if (!global.CustomEvent) {
+        // @ts-ignore
+        global.CustomEvent = CustomEvent;
+    }
+} catch (e) {
+}
 
 class RotateEvent extends CustomEvent<RotateEventData> {
     // @ts-ignore
     type: "rotate";
 
     constructor(data: RotateEventData) {
-        super("rotate", {detail: data});
+        super("rotate", {detail: data, });
     }
 }
 
