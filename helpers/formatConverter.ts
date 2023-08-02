@@ -238,6 +238,13 @@ export async function performExportToImage(data: Record<BoxName, Grids>) {
     deepWriteToMatrix(matrix, data.leftLegOuter.top, {x: 4, y: 48});
     deepWriteToMatrix(matrix, data.leftLegOuter.bottom, {x: 8, y: 48});
 
+    deepWriteToMatrix(matrix, data.leftArm.left, {x: 32, y: 52});
+    deepWriteToMatrix(matrix, data.leftArm.front, {x: 36, y: 52});
+    deepWriteToMatrix(matrix, data.leftArm.right, {x: 40, y: 52});
+    deepWriteToMatrix(matrix, data.leftArm.back, {x: 44, y: 52});
+    deepWriteToMatrix(matrix, data.leftArm.top, {x: 36, y: 48});
+    deepWriteToMatrix(matrix, data.leftArm.bottom, {x: 40, y: 48});
+
     deepWriteToMatrix(matrix, data.leftArmOuter.left, {x: 48, y: 52});
     deepWriteToMatrix(matrix, data.leftArmOuter.front, {x: 52, y: 52});
     deepWriteToMatrix(matrix, data.leftArmOuter.right, {x: 56, y: 52});
