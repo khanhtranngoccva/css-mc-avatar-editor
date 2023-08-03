@@ -19,18 +19,15 @@ function _AvatarPixelBox(props: {
     const [internalWalking, setInternalWalking] = React.useState(walking);
 
     React.useEffect(() => {
-        if (walking && !internalWalking) {
+        if (walking && walking !== internalWalking) {
             requestAnimationFrame(() => {
-                setInternalWalking(true);
+                setInternalWalking(walking);
             })
         }
     }, [walking, internalWalking]);
 
-
     React.useEffect(() => {
-        if (walking) {
-            setInternalWalking(false);
-        }
+        setInternalWalking(false);
     }, [walking, ...Object.values(shown)]);
 
     const style: React.CSSProperties = internalWalking ? {
