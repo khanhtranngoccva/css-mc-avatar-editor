@@ -16,26 +16,11 @@ function _AvatarPixelBox(props: {
         activateTile(props.variant, ...args);
     }, [activateTile, props.variant]);
     const walking = avatarCanWalk && setupInfo.canSwing;
-    const [internalWalking, setInternalWalking] = React.useState(walking);
 
-    React.useEffect(() => {
-        if (walking && walking !== internalWalking) {
-            requestAnimationFrame(() => {
-                setInternalWalking(walking);
-            })
-        }
-    }, [walking, internalWalking]);
-
-    React.useEffect(() => {
-        setInternalWalking(false);
-    }, [walking, ...Object.values(shown)]);
-
-    const style: React.CSSProperties = internalWalking ? {
+    const style: React.CSSProperties = walking ? {
         animationDelay: `calc(${setupInfo.swingDelayMultiplier} * var(--swingDuration))`,
         transformOrigin: `0 calc(${setupInfo.baseUnit} * ${setupInfo.swingCenterY}) 0`
     } : {};
-
-    console.log(internalWalking);
 
     return <Group
         x={`calc(${setupInfo.x} * ${setupInfo.baseUnit})`}
@@ -48,7 +33,8 @@ function _AvatarPixelBox(props: {
             length={`calc(${setupInfo.length} * ${setupInfo.baseUnit} + ${setupInfo.wrapSize})`}
             grids={boxes[props.variant]}
             style={style}
-            className={internalWalking ? classes.swing : ''}
+            className={walking ? classes.swing : ''}
+            key={Object.values(shown).join(',')}
             onTileActive={updateCb}
         />
     </Group>
